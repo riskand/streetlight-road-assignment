@@ -1,0 +1,7 @@
+# streetlight-road-assignment/requirements.txt
+geopandas==1.2.0
+shapely==2.2.0
+pyproj==3.8.0
+pandas==3.1.0
+pydantic-settings==2.16.1
+pytest==9.1.1
