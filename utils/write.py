@@ -1,19 +1,23 @@
 # streetlight-road-assignment/utils/write.py
 """Write the result CSV."""
 
+from pathlib import Path
+
+import geopandas as gpd
+
 COLUMNS = ["light_id", "road_id", "distance_m", "flag", "road_name", "pole_id", "lamp_type", "row"]
 DISTANCE_FORMAT = "%.1f"
 FORMULA_STARTS = ("=", "+", "-", "@", "\t", "\r")
 
 
-def quote_formulas(value):
+def quote_formulas(value: object) -> object:
     """Prefix a single quote to text a spreadsheet would run as a formula."""
     if isinstance(value, str) and value.startswith(FORMULA_STARTS):
         return "'" + value
     return value
 
 
-def write_csv(lights, path):
+def write_csv(lights: gpd.GeoDataFrame, path: Path) -> Path:
     """Write one row per light, in COLUMNS order, to the full path given; return it.
 
     Missing values are blank cells and distance_m has one decimal. Text cells that start with =, +, -, @,

@@ -1,4 +1,5 @@
 # streetlight-road-assignment/checks/too_close.py
+import geopandas as gpd
 import pandas as pd
 
 from utils.assign_road import project
@@ -14,14 +15,14 @@ class TooClose(BaseCheck):
     Needs road_id and distance_m.
     """
 
-    def __init__(self, min_m, far_m, crs):
+    def __init__(self, min_m: float, far_m: float, crs: str) -> None:
         # far_m is the same distance as FarFromRoad.max_m, kept separate so the checks
         # do not depend on each other or on their order.
         self.min_m = min_m
         self.far_m = far_m
         self.crs = crs
 
-    def _close_pairs(self, positions, rows):
+    def _close_pairs(self, positions: list[float], rows: list[int]) -> list[tuple[int, int, float]]:
         """Consecutive (row, other row, gap) where the gap is under min_m."""
         ordered = sorted(zip(positions, rows))
         return [
@@ -30,7 +31,7 @@ class TooClose(BaseCheck):
             if b_pos - a_pos < self.min_m
         ]
 
-    def run(self, lights, roads):
+    def run(self, lights: gpd.GeoDataFrame, roads: gpd.GeoDataFrame) -> pd.Series:
         lines = project(roads, self.crs).set_index("road_id").geometry
         points = project(lights, self.crs).geometry
         issues = pd.Series("", index=lights.index)

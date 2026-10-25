@@ -1,24 +1,26 @@
 # streetlight-road-assignment/utils/assign_road.py
 """Assign each light to its nearest road, with the distance in metres."""
 
+import geopandas as gpd
 import pandas as pd
+from shapely.geometry import Point
 
 DISTANCE_DECIMALS = 1
 
 
-def project(layer, crs):
+def project(layer: gpd.GeoDataFrame, crs: str) -> gpd.GeoDataFrame:
     """The layer in the metric CRS."""
     return layer.to_crs(crs)
 
 
-def nearest_road(point, road_lines):
+def nearest_road(point: Point, road_lines: gpd.GeoSeries) -> tuple[int, float]:
     """(position in road_lines, distance) of the nearest road; the first road wins a tie."""
     distances = road_lines.distance(point)
     position = int(distances.values.argmin())
     return position, distances.iloc[position]
 
 
-def assign_road(lights, roads, crs):
+def assign_road(lights: gpd.GeoDataFrame, roads: gpd.GeoDataFrame, crs: str) -> pd.DataFrame:
     """DataFrame (lights' index) with road_id, road_name, distance_m of the nearest road.
 
     Lights with no valid geometry get "" and NaN. Roads with no geometry are ignored.

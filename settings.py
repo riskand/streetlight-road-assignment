@@ -13,7 +13,7 @@ REPO_DIR = Path(__file__).parent
 ENV_FILE = REPO_DIR / ".env"
 
 
-def _one_group_pattern(value):
+def _one_group_pattern(value: str) -> str:
     """The pattern text if it compiles with exactly one group, else a ValueError."""
     try:
         compiled = re.compile(value)
@@ -60,12 +60,12 @@ class Settings(BaseSettings):
 
     @field_validator("lights_path", "roads_path", "output_csv", mode="before")
     @classmethod
-    def _resolve_path(cls, value):
+    def _resolve_path(cls, value: str | Path) -> Path:
         return REPO_DIR / value
 
     @field_validator("log_level")
     @classmethod
-    def _check_log_level(cls, value):
+    def _check_log_level(cls, value: str) -> str:
         name = value.upper()
         if name not in LOG_LEVELS:
             raise ValueError(f"must be one of {', '.join(LOG_LEVELS)}")
@@ -73,12 +73,12 @@ class Settings(BaseSettings):
 
     @field_validator("light_pattern", "pole_pattern")
     @classmethod
-    def _check_pattern(cls, value):
+    def _check_pattern(cls, value: str) -> str:
         return _one_group_pattern(value)
 
     @field_validator("light_step", "pole_step", "far_from_road_m", "too_close_m")
     @classmethod
-    def _check_positive(cls, value):
+    def _check_positive(cls, value: float) -> float:
         if value <= 0:
             raise ValueError("must be greater than 0")
         return value

@@ -3,6 +3,8 @@
 
 import logging
 
+import geopandas as gpd
+
 from checks.base import BasePrecondition
 
 logger = logging.getLogger(__name__)
@@ -11,7 +13,7 @@ logger = logging.getLogger(__name__)
 class SameCrs(BasePrecondition):
     """Stop the program if the two layers use different coordinate systems."""
 
-    def run(self, lights, roads) -> None:
+    def run(self, lights: gpd.GeoDataFrame, roads: gpd.GeoDataFrame) -> None:
         if lights.crs != roads.crs:
             logger.error("lights and roads use different coordinate systems: %s and %s", lights.crs, roads.crs)
             raise SystemExit(1)

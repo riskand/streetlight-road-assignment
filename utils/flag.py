@@ -6,7 +6,7 @@ import pandas as pd
 SEPARATOR = "; "
 
 
-def combine_reasons(reasons):
+def combine_reasons(reasons: list[pd.Series]) -> pd.Series:
     """One Series: each light's non-blank reasons joined with "; ", in the order given.
 
     reasons is a list of Series with the same index; "" (or NaN) means that check passed.

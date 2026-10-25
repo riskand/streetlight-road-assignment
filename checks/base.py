@@ -3,6 +3,7 @@
 
 from abc import ABC, abstractmethod
 
+import geopandas as gpd
 import pandas as pd
 
 
@@ -10,7 +11,7 @@ class BaseCheck(ABC):
     """One validation rule. It gives each light one plain-words reason, or "" when fine."""
 
     @abstractmethod
-    def run(self, lights, roads) -> pd.Series:
+    def run(self, lights: gpd.GeoDataFrame, roads: gpd.GeoDataFrame) -> pd.Series:
         """One reason per light, "" when fine, aligned to lights.index."""
 
 
@@ -23,6 +24,6 @@ class BasePrecondition(ABC):
     """
 
     @abstractmethod
-    def run(self, lights, roads) -> None:
+    def run(self, lights: gpd.GeoDataFrame, roads: gpd.GeoDataFrame) -> None:
         """Raise SystemExit with a plain-words message when the data cannot be
         processed. Return None when it can."""

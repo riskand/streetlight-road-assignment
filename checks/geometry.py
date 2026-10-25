@@ -1,6 +1,8 @@
 # streetlight-road-assignment/checks/geometry.py
 import math
+from collections.abc import Iterator
 
+import geopandas as gpd
 import pandas as pd
 from shapely.geometry import shape
 
@@ -18,7 +20,7 @@ class GeometryValid(BaseCheck):
     """
 
     @staticmethod
-    def _flatten(coordinates):
+    def _flatten(coordinates: list) -> Iterator[list]:
         """Yield every [lon, lat] pair in a nested coordinates list."""
         if coordinates and isinstance(coordinates[0], (int, float)):
             yield coordinates
@@ -27,7 +29,7 @@ class GeometryValid(BaseCheck):
             yield from GeometryValid._flatten(part)
 
     @staticmethod
-    def _coordinate_reasons(coordinates):
+    def _coordinate_reasons(coordinates: list) -> list[str]:
         """Reasons for NaN coordinates or coordinates outside the valid degree range."""
         reasons = []
         pairs = list(GeometryValid._flatten(coordinates))
@@ -38,7 +40,7 @@ class GeometryValid(BaseCheck):
         return reasons
 
     @staticmethod
-    def _build_reasons(geometry):
+    def _build_reasons(geometry: dict) -> list[str]:
         """Reasons from trying to build the declared geometry with shapely."""
         try:
             built = shape(geometry)
@@ -51,7 +53,7 @@ class GeometryValid(BaseCheck):
         return []
 
     @staticmethod
-    def _reason(geometry):
+    def _reason(geometry: dict | None) -> str:
         """"" if the geometry passes, else the reasons joined with "; "."""
         if geometry is None:
             return "geometry is missing"
@@ -62,7 +64,7 @@ class GeometryValid(BaseCheck):
             pass
         return "; ".join(reasons)
 
-    def run(self, lights, roads):
+    def run(self, lights: gpd.GeoDataFrame, roads: gpd.GeoDataFrame) -> pd.Series:
         return pd.Series(
             [self._reason(geometry) for geometry in lights["raw_geometry"]],
             index=lights.index,
